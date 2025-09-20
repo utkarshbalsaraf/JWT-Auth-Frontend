@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* colors */
+  --color-brandBlue: #00b7e6;
+  --color-pageBlack: #181a1b;
+  --color-textGray: #979797;
+  --color-pageGray: #1d2021;
+  --color-bgGray: #323232;
+
+  /* Dark Theme */
+  --color-darkBlack: #181a1b;
+  --color-lightBlack: #1d2021;
+  --color-darkTextGray: #979797;
+  --color-lightText: #636363;
+  --color-darkBlue: #00b7e6;
+  --color-darklogochat: #413f42;
+
+  /* Light Theme */
+  --color-lightGray: #f5f6f7;
+  --color-white: #ffffff;
+  --color-lightTextGray: #9f9f9f;
+  --color-lightBlue: #00b7e6;
+  --color-logoText: #333333;
+
+  /* animations */
+  --animate-rotate: rotate 1.5s linear infinite;
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg) scale(10);
+    }
+    100% {
+      transform: rotate(-360deg) scale(10);
+    }
+  }
+  --animate-shimmer: shimmer 1.5s linear infinite;
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
