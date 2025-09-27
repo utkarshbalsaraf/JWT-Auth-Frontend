@@ -2,22 +2,53 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 function Login({ setIsRegister }) {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [formData, setFormData] = useState({ username: "", password: "" });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const loginCall = async () => {
+    setLoginLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/login",
+        formData,
+        { withCredentials: true }
+      );
+      navigate("/");
+      const tokenExpiryISO = response.data.access_token_expiry;
+      const tokenExpiryDate = new Date(tokenExpiryISO);
+      const accessTokenExpiry = tokenExpiryDate.getTime() - 60 * 1000;
+      localStorage.setItem("accessToken", response.data.access_token);
+      localStorage.setItem("accessTokenExpiry", accessTokenExpiry);
+      return response;
+    } catch (error) {
+      console.error("Login Error:", error);
+      throw error;
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login submitted:", formData);
-    localStorage.setItem("token", "dummy-jwt-token");
-    navigate("/");
+    const loginPromise = loginCall();
 
-    // TODO: Add your auth logic
+    toast.promise(loginPromise, {
+      loading: "Logging in...",
+      success: "Login Successful ✅",
+      error: (err) => {
+        if (err.response?.status === 432) return "Username does not exist";
+        if (err.response?.status === 433) return "Incorrect Password";
+        return "Something went wrong";
+      },
+    });
   };
 
   return (
@@ -34,15 +65,14 @@ function Login({ setIsRegister }) {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Email / Username */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-1">
             Email or Username
           </label>
           <input
             type="text"
-            name="email"
-            value={formData.email}
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             placeholder="you@example.com"
             className="w-full px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -69,6 +99,7 @@ function Login({ setIsRegister }) {
         {/* Submit Button */}
         <button
           type="submit"
+          disabled={loginLoading}
           className="w-full py-2 px-4 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
         >
           Log In

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { registerUser } from "./Services/registerUser";
 import toast from "react-hot-toast";
+import { th } from "framer-motion/client";
 
 function Registration({ setIsRegister }) {
   const [formData, setFormData] = useState({
@@ -25,14 +26,9 @@ function Registration({ setIsRegister }) {
     setLoading(true);
     try {
       const response = await registerUser({ payload });
-      console.log("User registered:", response);
-      toast.success("Registered successfully!");
+      return response;
     } catch (error) {
-      if (error.status === 430) {
-        toast.error("Username already exist")
-      } else {
-        toast.error("Failed to register");
-      }
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -40,7 +36,15 @@ function Registration({ setIsRegister }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    callRegisterUser();
+    const registerPromise = callRegisterUser();
+    toast.promise(registerPromise, {
+      loading: "Registering...",
+      success: "Registration Successful ✅",
+      error: (err) => {
+        if (err.response?.status === 431) return "Username already exists";
+        return "Something went wrong";
+      },
+    });
   };
 
   return (
