@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 
+const baseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
 function Login({ setIsRegister }) {
   const navigate = useNavigate();
   const [loginLoading, setLoginLoading] = useState(false);
@@ -16,11 +18,9 @@ function Login({ setIsRegister }) {
   const loginCall = async () => {
     setLoginLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/auth/login",
-        formData,
-        { withCredentials: true }
-      );
+      const response = await axios.post(`${baseUrl}/api/auth/login`, formData, {
+        withCredentials: true,
+      });
       navigate("/");
       const tokenExpiryISO = response.data.access_token_expiry;
       const tokenExpiryDate = new Date(tokenExpiryISO);

@@ -33,7 +33,7 @@ const Home = () => {
     const intervalId = setInterval(() => {
       tokenVerification();
       const expiry = new Date(Number(localStorage.getItem("accessTokenExpiry")));
-      console.log("tokenExpiry", localStorage.getItem("accessTokenExpiry"), "Expiry Date:", expiry, "Current Date:", new Date());
+      // console.log("tokenExpiry", localStorage.getItem("accessTokenExpiry"), "Expiry Date:", expiry, "Current Date:", new Date());
       if (Date.now() >= expiry) {
         callRefreshToken();
       }
@@ -41,7 +41,7 @@ const Home = () => {
 
     return () => clearInterval(intervalId);
   }, []);
-  
+
   return (
     <div className="w-full h-full bg-gray-800">
       <button
